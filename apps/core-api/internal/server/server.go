@@ -26,8 +26,12 @@ func New() *fiber.App {
 	app.Use(middleware.RequestID())
 
 	userRepo := repositories.NewUserRepository(db)
-	authService := services.NewAuthService(userRepo)
-	authHandler := handlers.NewAuthHandler(authService)
+authService := services.NewAuthService(userRepo)
+authHandler := handlers.NewAuthHandler(authService)
+
+projectRepo := repositories.NewProjectRepository(db)
+projectService := services.NewProjectService(projectRepo)
+projectHandler := handlers.NewProjectHandler(projectService)
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
@@ -56,6 +60,12 @@ func New() *fiber.App {
 
 	authRoutes.Post("/register", authHandler.Register)
 	authRoutes.Post("/login", authHandler.Login)
+
+	projectRoutes := v1.Group("/projects")
+projectRoutes.Use(auth.Protected())
+
+projectRoutes.Post("/", projectHandler.Create)
+projectRoutes.Get("/", projectHandler.List)
 
 	protected := v1.Group("/protected")
 
