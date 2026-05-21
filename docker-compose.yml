@@ -1,4 +1,18 @@
 services:
+  core-api:
+    build:
+      context: .
+      dockerfile: apps/core-api/Dockerfile
+    container_name: shadowcoreos-core-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - ollama
+
   postgres:
     image: postgres:16-alpine
     container_name: shadowcoreos-postgres

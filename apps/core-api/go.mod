@@ -1,6 +1,6 @@
 module github.com/amantester/shadowcoreos/apps/core-api
 
-go 1.26.3
+go 1.23
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
