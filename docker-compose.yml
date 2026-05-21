@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shadowcoreos-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shadowcore
+      POSTGRES_PASSWORD: shadowcore_password
+      POSTGRES_DB: shadowcoreos
+    ports:
+      - "5432:5432"
+    volumes:
+      - shadowcoreos_postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: shadowcoreos-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:latest
+    container_name: shadowcoreos-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: shadowcore
+      MINIO_ROOT_PASSWORD: shadowcore_password
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - shadowcoreos_minio:/data
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: shadowcoreos-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - shadowcoreos_ollama:/root/.ollama
+
+volumes:
+  shadowcoreos_postgres:
+  shadowcoreos_minio:
+  shadowcoreos_ollama:
