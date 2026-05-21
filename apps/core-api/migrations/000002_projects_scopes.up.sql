@@ -1,0 +1,2 @@
+-- Projects and scopes were created in 000001_init.
+-- This migration is intentionally empty.

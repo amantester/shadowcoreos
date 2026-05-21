@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 
+	"github.com/amantester/shadowcoreos/apps/core-api/internal/auth"
 	"github.com/amantester/shadowcoreos/apps/core-api/internal/config"
 	"github.com/amantester/shadowcoreos/apps/core-api/internal/database"
 	"github.com/amantester/shadowcoreos/apps/core-api/internal/handlers"
@@ -51,10 +52,33 @@ func New() *fiber.App {
 		})
 	})
 
-	auth := v1.Group("/auth")
+	authRoutes := v1.Group("/auth")
 
-	auth.Post("/register", authHandler.Register)
-	auth.Post("/login", authHandler.Login)
+	authRoutes.Post("/register", authHandler.Register)
+	authRoutes.Post("/login", authHandler.Login)
+
+	protected := v1.Group("/protected")
+
+	protected.Use(auth.Protected())
+
+	protected.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"message": "authenticated access granted",
+			"user_id": c.Locals("user_id"),
+			"role":    c.Locals("role"),
+		})
+	})
+
+	admin := v1.Group("/admin")
+
+	admin.Use(auth.Protected())
+	admin.Use(auth.RequireRole("admin"))
+
+	admin.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"message": "admin access granted",
+		})
+	})
 
 	return app
 }
