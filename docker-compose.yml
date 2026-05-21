@@ -5,6 +5,10 @@ services:
       dockerfile: apps/core-api/Dockerfile
     container_name: shadowcoreos-core-api
     restart: unless-stopped
+    environment:
+      APP_ENV: development
+      PORT: "8080"
+      DATABASE_URL: postgres://shadowcore:shadowcore_password@postgres:5432/shadowcoreos?sslmode=disable
     ports:
       - "8080:8080"
     depends_on:
@@ -31,7 +35,7 @@ services:
     container_name: shadowcoreos-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6380:6379"
 
   minio:
     image: minio/minio:latest
@@ -42,8 +46,8 @@ services:
       MINIO_ROOT_USER: shadowcore
       MINIO_ROOT_PASSWORD: shadowcore_password
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9100:9000"
+      - "9101:9001"
     volumes:
       - shadowcoreos_minio:/data
 
@@ -52,7 +56,7 @@ services:
     container_name: shadowcoreos-ollama
     restart: unless-stopped
     ports:
-      - "11434:11434"
+      - "11435:11434"
     volumes:
       - shadowcoreos_ollama:/root/.ollama
 
