@@ -5,7 +5,11 @@ import (
 
 	"github.com/amantester/shadowcoreos/apps/core-api/internal/config"
 	"github.com/amantester/shadowcoreos/apps/core-api/internal/database"
+	"github.com/amantester/shadowcoreos/apps/core-api/internal/handlers"
 	"github.com/amantester/shadowcoreos/apps/core-api/internal/middleware"
+	"github.com/amantester/shadowcoreos/apps/core-api/internal/repositories"
+	"github.com/amantester/shadowcoreos/apps/core-api/internal/services"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,6 +23,10 @@ func New() *fiber.App {
 	})
 
 	app.Use(middleware.RequestID())
+
+	userRepo := repositories.NewUserRepository(db)
+	authService := services.NewAuthService(userRepo)
+	authHandler := handlers.NewAuthHandler(authService)
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
@@ -42,6 +50,11 @@ func New() *fiber.App {
 			"request_id": c.Locals("request_id"),
 		})
 	})
+
+	auth := v1.Group("/auth")
+
+	auth.Post("/register", authHandler.Register)
+	auth.Post("/login", authHandler.Login)
 
 	return app
 }
